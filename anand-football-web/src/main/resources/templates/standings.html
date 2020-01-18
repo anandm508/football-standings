@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Check Standings</title>
+
+<link rel="stylesheet"
+	th:href="@{webjars/bootstrap/4.2.1/css/bootstrap.min.css}" />
+<link rel="stylesheet" th:href="@{/css/main.css}" />
+<script type="text/javascript">
+	function loadCountries() {
+		let dropdown = document.getElementById('country-dropdown');
+		dropdown.length = 0;
+
+		let defaultOption = document.createElement('option');
+		defaultOption.text = 'Choose Country';
+
+		dropdown.add(defaultOption);
+		dropdown.selectedIndex = 0;
+
+		const url = 'http://localhost:9090/countries';
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+
+		request.onload = function() {
+			if (request.status === 200) {
+				const data = JSON.parse(request.responseText);
+				let option;
+				for (let i = 0; i < data.length; i++) {
+					option = document.createElement('option');
+					option.text = data[i].country_name;
+					option.value = data[i].country_id;
+					dropdown.add(option);
+				}
+			} else {
+				// Reached the server, but it returned an error
+			}
+		}
+
+		request.onerror = function() {
+			console.error('An error occurred fetching the JSON from ' + url);
+		};
+
+		request.send();
+	}
+
+	function fetchLeagues(selectObject) {
+		var value = selectObject.value;
+		console.log(value);
+
+		let dropdown = document.getElementById('league-dropdown');
+		dropdown.length = 0;
+
+		let defaultOption = document.createElement('option');
+		defaultOption.text = 'Choose League';
+
+		dropdown.add(defaultOption);
+		dropdown.selectedIndex = 0;
+
+		const url = 'http://localhost:9090/leagues/' + value;
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+
+		request.onload = function() {
+			if (request.status === 200) {
+				const data = JSON.parse(request.responseText);
+				let option;
+				for (let i = 0; i < data.length; i++) {
+					option = document.createElement('option');
+					option.text = data[i].league_name;
+					option.value = data[i].league_id;
+					dropdown.add(option);
+				}
+			} else {
+				// Reached the server, but it returned an error
+			}
+		}
+
+		request.onerror = function() {
+			console.error('An error occurred fetching the JSON from ' + url);
+		};
+
+		request.send();
+	}
+
+	function fetchTeams(selectObject) {
+		var value = selectObject.value;
+		console.log(value);
+
+		let dropdown = document.getElementById('team-dropdown');
+		dropdown.length = 0;
+
+		let defaultOption = document.createElement('option');
+		defaultOption.text = 'Choose Team';
+
+		dropdown.add(defaultOption);
+		dropdown.selectedIndex = 0;
+
+		const url = 'http://localhost:9090/teams/' + value;
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+
+		request.onload = function() {
+			if (request.status === 200) {
+				const data = JSON.parse(request.responseText);
+				let option;
+				for (let i = 0; i < data.length; i++) {
+					option = document.createElement('option');
+					option.text = data[i].team_name;
+					option.value = data[i].team_key;
+					dropdown.add(option);
+				}
+			} else {
+				// Reached the server, but it returned an error
+			}
+		}
+
+		request.onerror = function() {
+			console.error('An error occurred fetching the JSON from ' + url);
+		};
+
+		request.send();
+	}
+
+	function displayListings(selectObject) {
+		var value = selectObject.value;
+		console.log(value);
+
+		const url = 'http://localhost:9090/standings/leagueId/'
+				+ document.getElementById("league-dropdown").value + '/teamId/'
+				+ value;
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		var table = document.getElementById('standings');
+		request.onload = function() {
+			if (request.status === 200) {
+				const data = JSON.parse(request.responseText);
+				let option;
+				for (let i = 0; i < data.length; i++) {
+					var tr = document.createElement('tr');
+					tr.innerHTML = '<td>' + data[i].team_name + '</td>'
+							+ '<td>' + data[i].overall_league_position
+							+ '</td>';
+					table.appendChild(tr);
+				}
+			} else {
+				// Reached the server, but it returned an error
+			}
+		}
+
+		request.onerror = function() {
+			console.error('An error occurred fetching the JSON from ' + url);
+		};
+
+		request.send();
+	}
+</script>
+</head>
+
+<body onload="loadCountries()">
+
+	<main role="main" class="container">
+
+		<div class="starter-template">
+			<h1>Hello, Please select options to list the standings</h1>
+		</div>
+
+		<select id="country-dropdown" name="countries"
+			onchange="fetchLeagues(this)"></select> <select id="league-dropdown"
+			name="leagues" onchange="fetchTeams(this)"></select> <select
+			id="team-dropdown" name="teams" onchange="displayListings(this)"></select>
+
+
+
+	</main>
+	<!-- /.container -->
+	<br />
+	<br />
+	<table id="standings">
+
+		<tr>
+			<th><span class="glyphicon glyphicon-sort"></span>Team Name</th>
+			<th><span class="glyphicon glyphicon-sort"></span>&nbsp&Overall
+				League Position</th>
+		</tr>
+	</table>
+
+	<script type="text/javascript"
+		th:src="@{webjars/bootstrap/4.2.1/js/bootstrap.min.js}"></script>
+</body>
+</html>
